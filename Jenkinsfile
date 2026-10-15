@@ -30,6 +30,7 @@ pipeline {
                 sh '''
                     set -eu
                     docker rm -f hospital-portal-test >/dev/null 2>&1 || true
+
                     docker run -d --name hospital-portal-test \
                         -p 18084:80 "$IMAGE:$BUILD_NUMBER"
 
@@ -93,11 +94,7 @@ pipeline {
                             -n "$NAMESPACE" \
                             -o jsonpath='{.status.readyReplicas}')
 
-                        if [ "$READY" != "3" ]; then
-                            echo "ERROR: Expected three ready replicas."
-                            exit 1
-                        fi
-
+                        test "$READY" = "3"
                         echo "Stable release deployed with 3 replicas."
                         kubectl get deployment "$DEPLOYMENT" -n "$NAMESPACE"
                         kubectl get pods -l app=hospital-portal -n "$NAMESPACE"
@@ -121,15 +118,11 @@ pipeline {
                             -n "$NAMESPACE" \
                             -o jsonpath='{.spec.template.spec.containers[0].image}')
 
-                        if [ -z "$STABLE_IMAGE" ]; then
-                            echo "ERROR: Could not identify the stable image."
-                            exit 1
-                        fi
+                        test -n "$STABLE_IMAGE"
 
                         echo "Previous stable image: $STABLE_IMAGE"
                         echo "Deploying deliberately faulty image..."
 
-                        # This tag is intentionally nonexistent.
                         FAULTY_IMAGE="$IMAGE:faulty-demo"
 
                         kubectl set image deployment/"$DEPLOYMENT" \
@@ -138,10 +131,13 @@ pipeline {
 
                         if kubectl rollout status deployment/"$DEPLOYMENT" \
                             -n "$NAMESPACE" --timeout=45s; then
+
                             echo "ERROR: Faulty rollout unexpectedly succeeded."
+
                             kubectl set image deployment/"$DEPLOYMENT" \
                                 "$CONTAINER"="$STABLE_IMAGE" \
                                 -n "$NAMESPACE"
+
                             kubectl rollout status deployment/"$DEPLOYMENT" \
                                 -n "$NAMESPACE" --timeout=120s
                             exit 1
@@ -162,17 +158,24 @@ pipeline {
                             -n "$NAMESPACE" \
                             -o jsonpath='{.status.readyReplicas}')
 
-                        if [ "$READY" != "3" ]; then
-                            echo "ERROR: Stable release did not restore all replicas."
-                            exit 1
-                        fi
+                        test "$READY" = "3"
+                        echo "SUCCESS: Stable image restored; 3 replicas ready."
 
-                        echo "Checking restored application..."
+                        echo "Testing application through Kubernetes Service..."
+
+                        # Port-forward the Service for a reliable HTTP check.
+                        kubectl port-forward \
+                            service/"$SERVICE" 18085:80 \
+                            -n "$NAMESPACE" \
+                            >/tmp/hospital-port-forward.log 2>&1 &
+                        PF_PID=$!
+
+                        trap 'kill "$PF_PID" >/dev/null 2>&1 || true' EXIT
 
                         SUCCESS=0
-                        for i in $(seq 1 15); do
-                            if curl -fsS http://localhost:30034/ \
-                                -o /tmp/hospital-restored.html &&
+                        for i in $(seq 1 20); do
+                            if curl -fsS http://127.0.0.1:18085/ \
+                                -o /tmp/hospital-restored.html 2>/dev/null &&
                                 grep -q "CarePoint Hospital" /tmp/hospital-restored.html; then
                                 SUCCESS=1
                                 break
@@ -181,14 +184,12 @@ pipeline {
                         done
 
                         if [ "$SUCCESS" -ne 1 ]; then
+                            cat /tmp/hospital-port-forward.log
                             echo "ERROR: Restored application HTTP check failed."
                             exit 1
                         fi
 
-                        echo "SUCCESS: Stable image restored."
-                        echo "SUCCESS: Three replicas are ready."
                         echo "SUCCESS: Restored website responds correctly."
-
                         kubectl get deployment "$DEPLOYMENT" -n "$NAMESPACE"
                         kubectl get pods -l app=hospital-portal -n "$NAMESPACE"
                         kubectl get service "$SERVICE" -n "$NAMESPACE"
@@ -203,7 +204,7 @@ pipeline {
             sh 'docker rm -f hospital-portal-test >/dev/null 2>&1 || true'
         }
         success {
-            echo 'SUCCESS: Deployment, faulty rollout detection, rollback, and recovery verification completed.'
+            echo 'SUCCESS: Build, deployment, failed rollout detection, rollback, and recovery verification completed.'
         }
         failure {
             echo 'Pipeline failed. Inspect Console Output for the failing stage.'

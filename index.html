@@ -1,0 +1,94 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>College Placement Portal</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f9;
+  color: #172554;
+}
+header {
+  background: #12346b;
+  color: white;
+  padding: 28px 8%;
+}
+header h1 { margin: 0 0 8px; }
+nav { margin-top: 15px; }
+nav a { color: white; margin-right: 20px; text-decoration: none; }
+main { max-width: 1100px; margin: 30px auto; padding: 0 18px; }
+.intro, .contact, .job {
+  background: white;
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 12px #0000000d;
+}
+.jobs { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 18px; }
+.job h3 { color: #1d4ed8; }
+.package { font-size: 20px; font-weight: bold; color: #15803d; }
+.tag { display: inline-block; background: #dbeafe; padding: 6px 10px; border-radius: 15px; }
+footer { background: #12346b; color: white; padding: 20px; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>College Placement Portal</h1>
+  <p>Career opportunities for future professionals</p>
+  <nav>
+    <a href="#about">About</a>
+    <a href="#jobs">Job Opportunities</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+<main>
+  <section class="intro" id="about">
+    <h2>VIT University — School of Computing</h2>
+    <p>Explore campus recruitment opportunities, eligibility criteria, salary packages and application deadlines.</p>
+    <p><strong>Department:</strong> Computer Science and Engineering</p>
+  </section>
+
+  <h2 id="jobs">Current Placement Opportunities</h2>
+  <section class="jobs">
+    <article class="job">
+      <span class="tag">Applications Open</span>
+      <h3>TCS</h3>
+      <p><strong>Role:</strong> Software Engineer</p>
+      <p><strong>Eligibility:</strong> B.Tech / Integrated M.Tech, minimum 7.0 CGPA</p>
+      <p class="package">₹7 LPA</p>
+      <p><strong>Deadline:</strong> 30 November 2026</p>
+    </article>
+    <article class="job">
+      <span class="tag">Applications Open</span>
+      <h3>Infosys</h3>
+      <p><strong>Role:</strong> Systems Engineer</p>
+      <p><strong>Eligibility:</strong> Computing-related degree, minimum 6.5 CGPA</p>
+      <p class="package">₹6.5 LPA</p>
+      <p><strong>Deadline:</strong> 5 December 2026</p>
+    </article>
+    <article class="job">
+      <span class="tag">Applications Open</span>
+      <h3>Accenture</h3>
+      <p><strong>Role:</strong> Associate Software Engineer</p>
+      <p><strong>Eligibility:</strong> Eligible undergraduate or integrated-degree students</p>
+      <p class="package">₹4.5 LPA</p>
+      <p><strong>Deadline:</strong> 10 December 2026</p>
+    </article>
+  </section>
+
+  <section class="contact" id="contact">
+    <h2>Placement Contact</h2>
+    <p><strong>Office:</strong> Career Development Centre</p>
+    <p><strong>Email:</strong> placements@example.edu</p>
+    <p>Contact the placement office to confirm eligibility and recruitment dates.</p>
+  </section>
+</main>
+<footer>College Placement Portal | Career Development Centre</footer>
+</body>
+</html>
+```

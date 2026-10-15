@@ -21,7 +21,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE:$BUILD_NUMBER .'
+                sh 'docker build -t "$IMAGE:$BUILD_NUMBER" .'
             }
         }
 
@@ -62,7 +62,6 @@ pipeline {
                         set +x
                         echo "$DOCKER_PASS" | docker login \
                             -u "$DOCKER_USER" --password-stdin
-
                         docker push "$IMAGE:$BUILD_NUMBER"
                         docker logout
                     '''
@@ -81,7 +80,7 @@ pipeline {
                         export KUBECONFIG="$KUBECONFIG_FILE"
                         kubectl config use-context docker-desktop
 
-                        # Check whether this is a first deployment.
+                        # Save the stable image before modifying the Deployment.
                         OLD_IMAGE=$(kubectl get deployment "$DEPLOYMENT" \
                             -n "$NAMESPACE" \
                             -o jsonpath="{.spec.template.spec.containers[?(@.name==\\"$CONTAINER\\")].image}" \
@@ -93,22 +92,25 @@ pipeline {
                             echo "First deployment: no previous image exists."
                         fi
 
-                        # Create or update the Deployment and Service.
+                        # Create the Deployment and Service if they do not exist.
                         kubectl apply -f deployment.yaml
 
-                        # Deploy the version built by this Jenkins run.
+                        # Wait until the Deployment resource exists.
+                        kubectl get deployment "$DEPLOYMENT" -n "$NAMESPACE"
+
+                        # Deploy this build.
                         kubectl set image deployment/"$DEPLOYMENT" \
                             "$CONTAINER"="$IMAGE:$BUILD_NUMBER" \
                             -n "$NAMESPACE"
 
-                        # Check rollout; restore the old image if available.
+                        # Wait for rollout and restore the old image on failure.
                         if ! kubectl rollout status deployment/"$DEPLOYMENT" \
                             -n "$NAMESPACE" --timeout=120s; then
 
-                            echo "Rollout failed."
+                            echo "New rollout failed."
 
                             if [ -n "$OLD_IMAGE" ]; then
-                                echo "Restoring previous image: $OLD_IMAGE"
+                                echo "Restoring stable image: $OLD_IMAGE"
 
                                 kubectl set image deployment/"$DEPLOYMENT" \
                                     "$CONTAINER"="$OLD_IMAGE" \
@@ -116,21 +118,22 @@ pipeline {
 
                                 kubectl rollout status deployment/"$DEPLOYMENT" \
                                     -n "$NAMESPACE" --timeout=180s
+
                                 echo "Previous image restored."
                             else
-                                echo "No previous release exists to restore."
+                                echo "No previous stable image exists."
                             fi
 
                             exit 1
                         fi
 
-                        # Verify all three replicas are ready.
+                        # Confirm all three replicas are ready.
                         READY=$(kubectl get deployment "$DEPLOYMENT" \
                             -n "$NAMESPACE" \
                             -o jsonpath='{.status.readyReplicas}')
 
                         if [ "$READY" != "3" ]; then
-                            echo "Expected three ready replicas."
+                            echo "Three ready replicas were not confirmed."
 
                             if [ -n "$OLD_IMAGE" ]; then
                                 kubectl set image deployment/"$DEPLOYMENT" \
@@ -139,13 +142,12 @@ pipeline {
 
                                 kubectl rollout status deployment/"$DEPLOYMENT" \
                                     -n "$NAMESPACE" --timeout=180s
-                                echo "Previous image restored."
                             fi
 
                             exit 1
                         fi
 
-                        echo "Deployment successful: three replicas ready."
+                        echo "Deployment successful: 3 replicas ready."
                         kubectl get deployment "$DEPLOYMENT" -n "$NAMESPACE"
                         kubectl get pods -l app=hospital-portal -n "$NAMESPACE"
                         kubectl get service "$SERVICE" -n "$NAMESPACE"
@@ -159,13 +161,11 @@ pipeline {
         always {
             sh 'docker rm -f hospital-portal-test >/dev/null 2>&1 || true'
         }
-
         success {
             echo 'Hospital Appointment Portal deployed successfully.'
         }
-
         failure {
-            echo 'Pipeline failed. Check Console Output for deployment or rollback details.'
+            echo 'Pipeline failed. Inspect Console Output for the failing stage.'
         }
     }
 }

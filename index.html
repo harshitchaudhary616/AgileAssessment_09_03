@@ -4,78 +4,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>College Placement Portal</title>
+<title>CarePoint Hospital Appointment Portal</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#172554}
-header{background:#12346b;color:white;padding:30px 8%}
-header h1{margin:0 0 10px}
+body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#17324d}
+header{background:#075985;color:white;padding:28px 8%}
+header h1{margin:0 0 8px}
 nav{margin-top:18px}
 nav a{color:white;text-decoration:none;margin-right:20px}
 main{max-width:1100px;margin:30px auto;padding:0 18px}
-section,.job{background:white;padding:22px;border-radius:12px;margin-bottom:20px;box-shadow:0 3px 12px #0001}
-.jobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
-.job h3{color:#1d4ed8}
-.package{font-size:22px;font-weight:bold;color:#15803d}
-.tag{background:#dbeafe;padding:6px 10px;border-radius:15px}
-footer{background:#12346b;color:white;text-align:center;padding:22px}
+section,.doctor{background:white;padding:22px;border-radius:12px;margin-bottom:20px}
+.doctors{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.doctor h3{color:#0369a1}
+.tag{display:inline-block;background:#cffafe;padding:6px 10px;border-radius:15px}
+button{background:#0284c7;color:white;border:0;padding:11px 16px;border-radius:6px;cursor:pointer}
+input,select{width:100%;padding:10px;margin:8px 0 14px;border:1px solid #cbd5e1;border-radius:5px}
+footer{background:#075985;color:white;text-align:center;padding:20px}
 </style>
 </head>
 <body>
 <header>
-<h1>College Placement Portal</h1>
-<p>Discover opportunities. Build your career.</p>
+<h1>CarePoint Hospital</h1>
+<p>Your health, our priority — Appointment and Information Portal</p>
 <nav>
-<a href="#about">College</a>
-<a href="#jobs">Job Opportunities</a>
-<a href="#contact">Contact</a>
+<a href="#doctors">Doctors</a>
+<a href="#appointment">Appointments</a>
+<a href="#announcements">Announcements</a>
 </nav>
 </header>
 
 <main>
-<section id="about">
-<h2>VIT University — School of Computing</h2>
-<p>Department: Computer Science and Engineering</p>
-<p>Welcome to the campus recruitment portal. Explore job roles, eligibility requirements, packages and application deadlines.</p>
+<section>
+<h2>Welcome to CarePoint Hospital</h2>
+<p>Explore medical specializations, consultation timings and appointment availability.</p>
+<p><strong>Location:</strong> Main Hospital Campus</p>
+<p><strong>Emergency:</strong> Contact your local emergency service for urgent medical care.</p>
 </section>
 
-<h2 id="jobs">Placement Opportunities</h2>
-<div class="jobs">
-<article class="job">
-<span class="tag">Applications Open</span>
-<h3>TCS</h3>
-<p><b>Role:</b> Software Engineer</p>
-<p><b>Eligibility:</b> Computing degree, minimum 7.0 CGPA</p>
-<p class="package">₹7 LPA</p>
-<p><b>Deadline:</b> 30 November 2026</p>
+<h2 id="doctors">Our Doctors</h2>
+<div class="doctors">
+<article class="doctor">
+<span class="tag">General Medicine</span>
+<h3>Dr. Ananya Sharma</h3>
+<p><strong>Specialization:</strong> General Physician</p>
+<p><strong>Consultation:</strong> Mon–Fri, 9 AM–1 PM</p>
+<p><strong>Available slots:</strong> 10:00 AM, 11:30 AM</p>
 </article>
-
-<article class="job">
-<span class="tag">Applications Open</span>
-<h3>Infosys</h3>
-<p><b>Role:</b> Systems Engineer</p>
-<p><b>Eligibility:</b> Computing degree, minimum 6.5 CGPA</p>
-<p class="package">₹6.5 LPA</p>
-<p><b>Deadline:</b> 5 December 2026</p>
+<article class="doctor">
+<span class="tag">Cardiology</span>
+<h3>Dr. Rahul Mehta</h3>
+<p><strong>Specialization:</strong> Cardiologist</p>
+<p><strong>Consultation:</strong> Mon–Sat, 2 PM–5 PM</p>
+<p><strong>Available slots:</strong> 2:30 PM, 4:00 PM</p>
 </article>
-
-<article class="job">
-<span class="tag">Applications Open</span>
-<h3>Accenture</h3>
-<p><b>Role:</b> Associate Software Engineer</p>
-<p><b>Eligibility:</b> Eligible undergraduate or integrated-degree students</p>
-<p class="package">₹4.5 LPA</p>
-<p><b>Deadline:</b> 10 December 2026</p>
+<article class="doctor">
+<span class="tag">Dermatology</span>
+<h3>Dr. Priya Nair</h3>
+<p><strong>Specialization:</strong> Dermatologist</p>
+<p><strong>Consultation:</strong> Tue–Sat, 10 AM–2 PM</p>
+<p><strong>Available slots:</strong> 10:30 AM, 12:00 PM</p>
 </article>
 </div>
 
-<section id="contact">
-<h2>Placement Contact Information</h2>
-<p><b>Office:</b> Career Development Centre</p>
-<p><b>Email:</b> placements@example.edu</p>
-<p>Please contact the placement office to verify recruitment details.</p>
+<section id="appointment">
+<h2>Request an Appointment</h2>
+<p>This demonstration form does not submit real hospital bookings.</p>
+<form id="bookingForm">
+<label for="patient">Patient name</label>
+<input id="patient" required placeholder="Enter patient name">
+<label for="doctor">Choose specialization</label>
+<select id="doctor" required>
+<option value="">Select a specialization</option>
+<option>General Medicine</option>
+<option>Cardiology</option>
+<option>Dermatology</option>
+</select>
+<label for="slot">Preferred time</label>
+<select id="slot" required>
+<option value="">Select a slot</option>
+<option>10:00 AM</option>
+<option>11:30 AM</option>
+<option>2:30 PM</option>
+<option>4:00 PM</option>
+</select>
+<button type="submit">Request Appointment</button>
+<p id="message" aria-live="polite"></p>
+</form>
+</section>
+
+<section id="announcements">
+<h2>Hospital Announcements</h2>
+<ul>
+<li>Patients should arrive 15 minutes before their scheduled consultation.</li>
+<li>Please carry previous prescriptions and relevant medical reports.</li>
+<li>Appointment timings may change; contact the hospital to confirm availability.</li>
+</ul>
 </section>
 </main>
-<footer>College Placement Portal | Career Development Centre</footer>
+<footer>CarePoint Hospital | Appointment Information Portal</footer>
+<script>
+document.getElementById("bookingForm").addEventListener("submit",function(event){
+  event.preventDefault();
+  document.getElementById("message").textContent =
+    "Appointment request demo completed. Please contact the hospital to confirm a real booking.";
+});
+</script>
 </body>
 </html>
